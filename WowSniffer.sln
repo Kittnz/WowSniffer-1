@@ -1,0 +1,28 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2013
+VisualStudioVersion = 12.0.31101.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "WowSniffer", "WowSniffer\WowSniffer.vcxproj", "{2682F629-EA9C-4729-9B9E-3EAAB9074BF2}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Injector", "Injector\Injector.vcxproj", "{590253B1-6207-46E3-B579-75BDBB0E0499}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
+		Release|Win32 = Release|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{2682F629-EA9C-4729-9B9E-3EAAB9074BF2}.Debug|Win32.ActiveCfg = Debug|Win32
+		{2682F629-EA9C-4729-9B9E-3EAAB9074BF2}.Debug|Win32.Build.0 = Debug|Win32
+		{2682F629-EA9C-4729-9B9E-3EAAB9074BF2}.Release|Win32.ActiveCfg = Release|Win32
+		{2682F629-EA9C-4729-9B9E-3EAAB9074BF2}.Release|Win32.Build.0 = Release|Win32
+		{590253B1-6207-46E3-B579-75BDBB0E0499}.Debug|Win32.ActiveCfg = Debug|Win32
+		{590253B1-6207-46E3-B579-75BDBB0E0499}.Debug|Win32.Build.0 = Debug|Win32
+		{590253B1-6207-46E3-B579-75BDBB0E0499}.Release|Win32.ActiveCfg = Release|Win32
+		{590253B1-6207-46E3-B579-75BDBB0E0499}.Release|Win32.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
