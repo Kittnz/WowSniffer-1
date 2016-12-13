@@ -2,6 +2,8 @@
 #include "PktFile.h"
 #include "Functions.h"
 #include "BuildConfig.h"
+#include "Opcodes.h"
+#include "TableHashes.h"
 
 PktFile* pktFile;
 
@@ -18,8 +20,10 @@ void AllocNewConsole()
 {
     if (!AllocConsole())
         return;
-
-    freopen("CONOUT$", "r+", stdout);
+        
+    freopen("CONIN$", "r", stdin); 
+    freopen("CONOUT$", "w", stdout); 
+    freopen("CONOUT$", "w", stderr); 
 }
 
 struct ProcessMessageArgs
@@ -78,45 +82,11 @@ void Detach()
     // FreeLibrary(SnifferModulePath);
 }
 
-void WINAPI main(void* args)
-{
-    // Allocate a console
-    AllocNewConsole();
+void* CDataStoreVFTable = reinterpret_cast<void*>(0xDFFD50);
+typedef int (__stdcall *pFunc)(CDataStore*);
+pFunc sendInternal = reinterpret_cast<pFunc>(0x485CE9);
 
-    // Generate new .pkt file
-    pktFile = PktFile::Create();
-
-    if (!pktFile)
-    {
-        Detach();
-        return;
-    }
-
-    // Gets either "Wow", "WowB" or "WowT"
-    std::string wowBuildType = GetFilenameWithoutExtension(GetMainModuleW().szExePath);
-
-    // Load the patterns and info for hooking
-    uint32 build;
-    GetBuildInfo(nullptr, nullptr, nullptr, &build);
-
-    if (!config.Load(SnifferFolder, wowBuildType, build))
-    {
-        Detach();
-        return;
-    }
-
-    // Wait untill Wow properly loads
-    while (config.GetProcessMessageAddress() == 0 || config.GetSend2Address() == 0)
-        std::this_thread::sleep_for(std::chrono::milliseconds(500));
-
-    printf("ProcessMessageHook: 0x%X\nSend2Hook: 0x%X\n", config.GetProcessMessageAddress(), config.GetSend2Address());
-    uint8 preHookCode[] = { Instructions::Push_Ebp};
-    uint8 postHooKCode[] = { Instructions::Pop_Ebp };
-
-    send2HookCode = Hook(config.GetProcessMessageAddress(), config.ProcessMessageHookLen, preHookCode, sizeof(preHookCode), postHooKCode, sizeof(postHooKCode), (int32)&SMSGHook, true, send2OldCode);
-    processMessageHookCode = Hook(config.GetSend2Address(), config.Send2HookLen, preHookCode, sizeof(preHookCode), postHooKCode, sizeof(postHooKCode), (int32)&CMSGHook, true, processMessageOldCode);
-    return;
-}
+void WINAPI main(void* args);
 
 void DestroyHook()
 {
@@ -225,6 +195,81 @@ uint8* Hook(int32 Address, uint32 OriginalCodeLen, uint8* PreCallCode, uint32 Pr
     VirtualProtect(FunctionCodePointer, detourLen, originalPermissions, &modifiedPermissions);
 
     return code;
+}
+
+void SendPacket(CDataStore* store)
+{
+    store->Put<uint32>(store->Size, 0);
+    store->SetRPos(4);
+    sendInternal(store);
+}
+
+void RequestQuest(uint32 id)
+{
+    CDataStore data(Opcodes::CMSG_QUERY_QUEST_INFO, 6);
+    data << uint32(1393);
+    data << uint16(0);
+    SendPacket(&data);
+}
+
+void RequestDB2Entry(TableHashes hash, uint32 id)
+{
+    CDataStore data(Opcodes::CMSG_DB_QUERY_BULK, 4 + 2 + 2 + 4);
+    data << uint32(hash);
+    data << uint8(0);
+    data << uint8(1 << 3);
+    data << uint16(0);      // guid
+    data << uint32(id);
+    SendPacket(&data);
+}
+
+void __stdcall main(void* args)
+{
+    // Allocate a console
+    AllocNewConsole();
+
+    // Generate new .pkt file
+    pktFile = PktFile::Create();
+
+    if (!pktFile)
+    {
+        Detach();
+        return;
+    }
+
+    // Gets either "Wow", "WowB" or "WowT"
+    auto wowBuildType = GetFilenameWithoutExtension(GetMainModuleW().szExePath);
+
+    // Load the patterns and info for hooking
+    uint32 build;
+    GetBuildInfo(nullptr, nullptr, nullptr, &build);
+
+    if (!config.Load(SnifferFolder, wowBuildType, build))
+    {
+        Detach();
+        return;
+    }
+
+    // Wait untill Wow properly loads
+    while (config.GetProcessMessageAddress() < 0xFF || config.GetSend2Address() < 0xFF)
+        std::this_thread::sleep_for(std::chrono::milliseconds(500));
+
+    printf("ProcessMessageHook: 0x%X\nSend2Hook: 0x%X\n", config.GetProcessMessageAddress(), config.GetSend2Address());
+    uint8 preHookCode[] = {Instructions::Push_Ebp};
+    uint8 postHooKCode[] = {Instructions::Pop_Ebp};
+
+    send2HookCode = Hook(config.GetProcessMessageAddress(), config.ProcessMessageHookLen, preHookCode, sizeof(preHookCode), postHooKCode, sizeof(postHooKCode), (int32)&SMSGHook, true, send2OldCode);
+    processMessageHookCode = Hook(config.GetSend2Address(), config.Send2HookLen, preHookCode, sizeof(preHookCode), postHooKCode, sizeof(postHooKCode), (int32)&CMSGHook, true, processMessageOldCode);
+
+    char line[256];
+    while (gets(line))
+    {
+       /* for (auto i = 0u; i < 1000; ++i)
+        {
+            RequestDB2Entry(TableHashes::Bounty, i);
+            std::this_thread::sleep_for(std::chrono::milliseconds(4));
+        }*/
+    }
 }
 
 BOOL APIENTRY DllMain(HMODULE hModule, DWORD  ul_reason_for_call, LPVOID lpReserved)

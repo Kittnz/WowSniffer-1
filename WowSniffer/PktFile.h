@@ -3,6 +3,7 @@
 
 #include <Windows.h>
 #include <string>
+#include "CDataStore.h"
 
 class PktFile
 {

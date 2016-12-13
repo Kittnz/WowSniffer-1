@@ -81,6 +81,7 @@ bool BuildConfig::Load(std::wstring folder, std::string wowBuildType, uint32 bui
     _ReadUIntValue("Send2HookLen", Send2HookLen);
     _ReadUIntValue("Send2OpcodeSize", Send2OpcodeSize);
     _ReadUIntValue("Send2OpcodeOffset", Send2OpcodeOffset);
+    return true;
 }
 
 int32 BuildConfig::GetProcessMessageAddress()
@@ -139,7 +140,7 @@ bool BuildConfig::_ProcessConfigFile(std::wstring file)
 
 bool BuildConfig::_ReadPattern(std::string name, uint8*& buffer, uint32& bufferLen, std::string& patternFlags)
 {
-    auto& itr = _configValues.find(name);
+    auto const& itr = _configValues.find(name);
     if (itr == _configValues.end())
         return false;
 
@@ -187,7 +188,7 @@ bool BuildConfig::_ReadPattern(std::string name, uint8*& buffer, uint32& bufferL
 
 bool BuildConfig::_ReadUIntValue(std::string name, uint32& value)
 {
-    auto& itr = _configValues.find(name);
+    auto const& itr = _configValues.find(name);
     if (itr == _configValues.end())
         return false;
 
@@ -201,4 +202,5 @@ bool BuildConfig::_ReadUIntValue(std::string name, uint32& value)
     }
 
     value = atol(str.c_str());
+    return true;
 }

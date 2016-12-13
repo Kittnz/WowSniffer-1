@@ -14,6 +14,7 @@
 #include <chrono>
 #include <thread>
 #include <Psapi.h>
+#include "Opcodes.h"
 
 typedef int64_t            int64;
 typedef int32_t            int32;
@@ -24,13 +25,5 @@ typedef uint32_t           uint32;
 typedef uint16_t           uint16;
 typedef uint8_t            uint8;
 
-struct CDataStore
-{
-    virtual void vf_table() {};
 
-    char* Buffer;
-    uint32 Base;
-    uint32 Alloc;
-    uint32 Size;
-    uint32 Read;
-};
+extern void* CDataStoreVFTable;

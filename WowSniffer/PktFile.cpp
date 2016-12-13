@@ -119,7 +119,7 @@ void PktFile::Write(uint32 offset, T const& value)
     WriteFile(file, &value, sizeof(value), nullptr, nullptr);
 
     SetFilePointer(file, currentOffset, nullptr, FILE_BEGIN);
-    return *this;
+    return;
 }
 
 void PktFile::WriteBytes(char const* buffer, uint32 size)

@@ -24,7 +24,7 @@ MODULEENTRY32W GetMainModuleW()
 
 int32 GetMainModuleAddress()
 {
-    return (int32)GetMainModule().modBaseAddr;
+    return reinterpret_cast<uint32>(GetMainModule().modBaseAddr);
 }
 
 int32 GetMainModuleSize()
@@ -48,7 +48,7 @@ void GetBuildInfo(uint32* expVersion, uint32* majorVersion, uint32* minorVersion
 
     VS_FIXEDFILEINFO* fixedFileInfo;
     WCHAR* path = GetMainModuleW().szExePath;
-    DWORD size = GetFileVersionInfoSizeW(path, NULL);
+    DWORD size = GetFileVersionInfoSizeW(path, nullptr);
 
     if (!size)
         return;

@@ -30,6 +30,15 @@
     <ClInclude Include="BuildConfig.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="CDataStore.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Opcodes.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="TableHashes.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -48,6 +57,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="BuildConfig.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CDataStore.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
